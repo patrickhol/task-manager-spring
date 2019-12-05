@@ -5,10 +5,9 @@ import com.holody.taskmanager.tasks.boundary.TaskRepository;
 import com.holody.taskmanager.tasks.entity.Task;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -31,7 +30,8 @@ public class TasksService {
                         title,
                         author,
                         description,
-                        clock.time()
+                        clock.time(),
+                        new HashSet<>()
                 ));
     }
 
@@ -40,9 +40,9 @@ public class TasksService {
         return taskRepository.fetchById(id);
     }
 
-    public void updateTask(Long id, String title, String author, String description) {
+    public void updateTask(Long id, String title, String author, String description, String file) {
 
-        taskRepository.update(id, title, author, description);
+        taskRepository.update(id, title, author, description, file);
     }
 
     public List<Task> fetchAll() {

@@ -7,4 +7,5 @@ class CreateTaskRequest {
     String title;
     String author;
     String description;
+    String file;
 }

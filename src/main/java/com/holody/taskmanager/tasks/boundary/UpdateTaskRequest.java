@@ -7,4 +7,5 @@ class UpdateTaskRequest {
     String title;
     String author;
     String description;
+    String file;
 }

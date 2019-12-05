@@ -14,5 +14,5 @@ public interface TaskRepository {
 
     void deleteById(Long id);
 
-    void update(Long id, String title, String author, String description);
+    void update(Long id, String title, String author, String description, String file);
 }

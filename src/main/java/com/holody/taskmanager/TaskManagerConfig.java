@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
@@ -31,7 +30,6 @@ public class TaskManagerConfig {
 
     @Bean
     StorageService storageService() {
-        System.out.println(config.getPathToUploadFiles());
         return new FileSystemStorageService(
                 Paths.get(config.getPathToUploadFiles()));
     }

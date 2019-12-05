@@ -12,12 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,18 +65,31 @@ public class TaskController {
 
     @GetMapping(path = "/{id}/attachments/{filename}")
     public ResponseEntity getAttachment(@PathVariable Long id, @PathVariable String filename, HttpServletRequest request) throws IOException {
-        Resource resource = storageService.loadFile(filename);
-        String mimeType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(mimeType))
-                .body(resource);
+        Task task = tasksService.fetchById(id);
+        if (task instanceof Task) {
+            Resource resource = storageService.loadFile(filename);
+            String mimeType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(mimeType))
+                    .body(resource);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @PostMapping(path = "/{id}/attachments")
     public ResponseEntity addAttachment(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
-        log.info(" Zapis " + file.getOriginalFilename());
-        storageService.saveFile(id, file);
-        return ResponseEntity.noContent().build();
+        Task task = tasksService.fetchById(id);
+        if (task instanceof Task) {
+
+            log.info(" Zapis " + file.getOriginalFilename());
+            storageService.saveFile(id, file);
+            tasksService.updateTask(id, task.getTitle(), task.getAuthor(), task.getDescription(), file.getOriginalFilename());
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 
@@ -87,7 +98,7 @@ public class TaskController {
         try {
             log.info("Adding new task: {}", task);
             tasksService.addTask(task.title, task.author, task.description);
-            return ResponseEntity.status(HttpStatus.CREATED).body(task.title + task.author + task.description);
+            return ResponseEntity.status(HttpStatus.CREATED).body(task.title + task.author + task.description + task.file);
 
         } catch (NotFoundException e) {
             log.error("Failed to add task ", e);
@@ -117,7 +128,7 @@ public class TaskController {
             HttpServletResponse response,
             @PathVariable Long id, @RequestBody UpdateTaskRequest request) {
         try {
-            tasksService.updateTask(id, request.title, request.author, request.description);
+            tasksService.updateTask(id, request.title, request.author, request.description, request.file);
             log.info("Update a task.");
             return ResponseEntity.noContent().build();
         } catch (NotFoundException e) {
@@ -136,7 +147,8 @@ public class TaskController {
                 task.getTitle(),
                 task.getDescription(),
                 task.getAuthor(),
-                task.getCreatedAt()
+                task.getCreatedAt(),
+                task.getFiles()
         );
     }
 }

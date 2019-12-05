@@ -35,12 +35,13 @@ public class MemoryTaskRepository implements TaskRepository {
     }
 
     @Override
-    public void update(Long id, String title, String author, String description) {
+    public void update(Long id, String title, String author, String description, String file) {
         Task task = findById(id)
                 .orElseThrow(() -> new NotFoundException("Task with id " + id + " not found! "));
         task.setTitle(title);
         task.setAuthor(author);
         task.setDescription(description);
+        task.getFiles().add(file);
 
     }
 
