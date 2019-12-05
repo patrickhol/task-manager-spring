@@ -1,0 +1,2 @@
+app.storage:
+  pathToUploadFiles: ./opt/taskmanager/files
